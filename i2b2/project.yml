@@ -1,0 +1,69 @@
+title: "SpaCy model for drug names and attributes in i2b2 2018 challenge"
+description: "This project aims to detect drug names and a subset of attributes from the i2b2 2018 challenge"
+# Variables can be referenced across the project.yml using ${vars.var_name}
+vars:
+  config: "config_trf.cfg"
+  name: "i2b2_drugs"
+  version: "0.0.0"
+  train: "train"
+  dev: "test"
+
+# These are the directories that the project needs. The project CLI will make
+# sure that they always exist.
+directories: ["raw", "corpus", "configs", "scripts", "packages"]
+
+# Assets that should be downloaded or available in the directory
+assets:
+  - dest: "raw/training_20180910/"
+    checksum: "4461081e67d8160cab4624e61448f371"
+    description: "Training set from 2018 challenge"
+  - dest: "raw/test/"
+    checksum: "4d730f6132de46fad3f76720ce9794f7"
+    description: "Test set from 2018 challenge"
+
+# Workflows are sequences of commands (see below) executed in order. You can
+# run them via "spacy project run [workflow]". If a commands's inputs/outputs
+# haven't changed, it won't be re-run.
+workflows:
+  all:
+    - preprocess
+    - train
+    - evaluate
+
+# Project commands, specified in a style similar to CI config files (e.g. Azure
+# pipelines). The name is the command name that lets you trigger the command
+# via "spacy project run [command] [path]". The help message is optional and
+# shown when executing "spacy project run [optional command] [path] --help".
+commands:
+  - name: "preprocess"
+    help: "Convert the data to spaCy's binary format"
+    script:
+      - "python scripts/preprocess_i2b2.py raw/training_20180910/ corpus/train.spacy"
+      - "python scripts/preprocess_i2b2.py raw/test corpus/test.spacy"
+    deps:
+      - "raw/training_20180910/"
+      - "raw/test/"
+      - "scripts/preprocess_i2b2.py"
+    outputs:
+      - "corpus/${vars.train}.spacy"
+      - "corpus/${vars.dev}.spacy"
+
+  - name: "train"
+    help: "Train a named entity recognition model"
+    script:
+      - "python -m spacy train configs/${vars.config} --output training/ --paths.train corpus/${vars.train}.spacy --paths.dev corpus/${vars.dev}.spacy --paths.vectors en_core_web_md --gpu-id 0"
+    deps:
+      - "corpus/${vars.train}.spacy"
+      - "corpus/${vars.dev}.spacy"
+    outputs:
+      - "training/model-best"
+
+  - name: "evaluate"
+    help: "Evaluate the model and export metrics"
+    script:
+      - "python -m spacy evaluate training/model-best corpus/${vars.dev}.spacy --output training/metrics.json"
+    deps:
+      - "corpus/${vars.dev}.spacy"
+      - "training/model-best"
+    outputs:
+      - "training/metrics.json"
