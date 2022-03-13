@@ -1,10 +1,8 @@
 # converting i2b2 annotations to json for use
 import typer
 from pathlib import Path
-from spacy.util import get_words_and_spaces
-from spacy.tokens import Doc, DocBin
+from spacy.tokens import DocBin
 import spacy
-from glob import glob
 
 # globally setting a subset of labels
 INCL_LABELS = ['Dosage', 'Drug', 'Form', 'Frequency']

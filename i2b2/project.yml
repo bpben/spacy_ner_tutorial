@@ -51,7 +51,10 @@ commands:
   - name: "train"
     help: "Train a named entity recognition model"
     script:
-      - "python -m spacy train configs/${vars.config} --output training/ --paths.train corpus/${vars.train}.spacy --paths.dev corpus/${vars.dev}.spacy --paths.vectors en_core_web_md --gpu-id 0"
+      # CNN model
+      #- "python -m spacy train configs/${vars.config} --output training/ --paths.train corpus/${vars.train}.spacy --paths.dev corpus/${vars.dev}.spacy --paths.vectors en_core_web_md"
+      # TRF model
+      - "python -m spacy train configs/${vars.config} --output training/ --paths.train corpus/${vars.train}.spacy --paths.dev corpus/${vars.dev}.spacy --gpu-id 0"
     deps:
       - "corpus/${vars.train}.spacy"
       - "corpus/${vars.dev}.spacy"
@@ -61,7 +64,10 @@ commands:
   - name: "evaluate"
     help: "Evaluate the model and export metrics"
     script:
-      - "python -m spacy evaluate training/model-best corpus/${vars.dev}.spacy --output training/metrics.json"
+      # CPU
+      #- "python -m spacy evaluate training/model-best corpus/${vars.dev}.spacy --output training/metrics.json"
+      # GPU
+      - "python -m spacy evaluate training/model-best corpus/${vars.dev}.spacy --output training/metrics.json --gpu-id 0"
     deps:
       - "corpus/${vars.dev}.spacy"
       - "training/model-best"
