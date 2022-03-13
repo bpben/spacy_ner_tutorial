@@ -4,12 +4,17 @@ from pathlib import Path
 from spacy.tokens import DocBin
 import spacy
 
-# globally setting a subset of labels
+# globally picking a subset of labels
 INCL_LABELS = ['Dosage', 'Drug', 'Form', 'Frequency']
 
 def main(
     input_path: Path = typer.Argument(..., exists=True),
     output_path: Path = typer.Argument(...)):
+    """
+    Preprocess i2b2 data for use in spacy pipeline
+    :param input_path: directory with txt and ann files
+    :param output_path: path for DocBin output
+    """
     nlp = spacy.blank("en")
     doc_bin = DocBin(attrs=["ENT_IOB", "ENT_TYPE"])
     # get all ann
