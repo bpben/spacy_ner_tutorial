@@ -36,9 +36,10 @@ def main(
             if len(ann) != 3:
                 continue
             ann_type, label_idx, text = ann
-            # cases of line splits indicated by semicolons - just take whole span
+            # just want text annotations, not relations
             if ann_type[0] != 'T':
                 continue
+            # cases of line splits indicated by semicolons - just take whole span
             elif ';' in label_idx:
                 label_idx_filtered = []
                 for el in label_idx.split():

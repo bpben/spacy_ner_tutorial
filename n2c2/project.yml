@@ -2,7 +2,8 @@ title: "SpaCy model for drug names and attributes in i2b2 2018 challenge"
 description: "This project aims to detect drug names and a subset of attributes from the i2b2 2018 challenge"
 # Variables can be referenced across the project.yml using ${vars.var_name}
 vars:
-  config: "config_trf.cfg"
+  config: "config.cfg"
+  config_trf: "config_trf.cfg"
   name: "i2b2_drugs"
   version: "0.0.0"
   train: "train"
@@ -61,6 +62,16 @@ commands:
     outputs:
       - "training/model-best"
 
+  - name: "train_trf"
+    help: "Train a named entity recognition model with a transformer config (uses GPU)"
+    script:
+      - "python -m spacy train configs/${vars.config_trf} --output training/ --paths.train corpus/${vars.train}.spacy --paths.dev corpus/${vars.dev}.spacy --gpu-id 0"
+    deps:
+      - "corpus/${vars.train}.spacy"
+      - "corpus/${vars.dev}.spacy"
+    outputs:
+      - "training/model-best"
+
   - name: "evaluate"
     help: "Evaluate the model and export metrics"
     script:
@@ -73,3 +84,13 @@ commands:
       - "training/model-best"
     outputs:
       - "training/metrics.json"
+
+  - name: "evaluate_trf"
+    help: "Evaluate the trf model"
+    script:
+      - "python -m spacy evaluate training_trf/model-best corpus/${vars.dev}.spacy --output training_trf/metrics.json --gpu-id 0"
+    deps:
+      - "corpus/${vars.dev}.spacy"
+      - "training_trf/model-best"
+    outputs:
+      - "training_trf/metrics.json"

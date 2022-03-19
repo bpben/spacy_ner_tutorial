@@ -1,0 +1,2 @@
+# Modified project files from spaCy tutorial
+These files will be used to modify the [ner_drugs tutorial]() to use a transformer.  You will need to separately clone that repository and then overwrite the config.cfg and project.yml files.
