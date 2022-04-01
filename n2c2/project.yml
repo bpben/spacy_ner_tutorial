@@ -16,10 +16,8 @@ directories: ["raw", "corpus", "configs", "scripts", "packages"]
 # Assets that should be downloaded or available in the directory
 assets:
   - dest: "raw/training_20180910/"
-    checksum: "4461081e67d8160cab4624e61448f371"
     description: "Training set from 2018 challenge"
   - dest: "raw/test/"
-    checksum: "4d730f6132de46fad3f76720ce9794f7"
     description: "Test set from 2018 challenge"
 
 # Workflows are sequences of commands (see below) executed in order. You can
@@ -52,10 +50,7 @@ commands:
   - name: "train"
     help: "Train a named entity recognition model"
     script:
-      # CNN model
-      #- "python -m spacy train configs/${vars.config} --output training/ --paths.train corpus/${vars.train}.spacy --paths.dev corpus/${vars.dev}.spacy --paths.vectors en_core_web_md"
-      # TRF model
-      - "python -m spacy train configs/${vars.config} --output training/ --paths.train corpus/${vars.train}.spacy --paths.dev corpus/${vars.dev}.spacy --gpu-id 0"
+      - "python -m spacy train configs/${vars.config} --output training/ --paths.train corpus/${vars.train}.spacy --paths.dev corpus/${vars.dev}.spacy --paths.vectors en_core_web_md"
     deps:
       - "corpus/${vars.train}.spacy"
       - "corpus/${vars.dev}.spacy"
@@ -70,7 +65,7 @@ commands:
       - "corpus/${vars.train}.spacy"
       - "corpus/${vars.dev}.spacy"
     outputs:
-      - "training/model-best"
+      - "training_trf/model-best"
 
   - name: "evaluate"
     help: "Evaluate the model and export metrics"
